@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project name="sample" basedir="." default="notify">
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="target"/>
+    <!-- compile java file -->
+    <target name="build" description="Compile source tree java files">
+        <echo>start task: build..</echo>
+        <mkdir dir="${build.dir}"/>
+        <javac destdir="${build.dir}" source="1.8" target="1.8">
+            <src path="${src.dir}"/>
+            <!-- <classpath refid="master-classpath"/> -->
+        </javac>
+    </target>
+    <!-- clean output files -->
+    <target name="clean" description="Clean output directories">
+        <delete dir="${build.dir}"/>
+    </target>
+    <!-- run a java class -->
+    <target name="hello" description="Run class Hello">
+        <java fork="true" failonerror="yes" classname="Hello" classpath="${build.dir}">
+            <arg line="Daphnis"/>
+        </java>
+    </target>
+</project>
