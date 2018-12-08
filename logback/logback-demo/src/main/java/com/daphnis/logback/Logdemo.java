@@ -18,6 +18,9 @@ public class Logdemo {
 	}
 
 	public static void main(String[] args) {
-		printMsg();
+		for(int i=0;i<1*10000;++i){
+			printMsg();
+		}
 	}
+
 }
