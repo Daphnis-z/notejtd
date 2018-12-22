@@ -31,20 +31,14 @@
         <file>log/logdemo.log</file>
 
         <!-- 当发生滚动时的行为  -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <!-- 必须包含“%i”例如，假设最小值和最大值分别为1和2，命名模式为 mylog%i.log,会产生归档文件mylog1.log和mylog2.log。还可以指定文件压缩选项，例如，mylog%i.log.gz 或者 没有log%i.log.zip -->
-            <FileNamePattern>log/logback-test.%i.log</FileNamePattern>
-            <!-- 窗口索引最小值 -->
-            <minIndex>1</minIndex>
-            <!-- 窗口索引最大值 -->
-            <maxIndex>1</maxIndex>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>log/logdemo-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>200KB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>800KB</totalSizeCap>
         </rollingPolicy>
-
-        <!-- 激活滚动的条件。 -->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <!-- 活动文件的大小，默认值是10MB -->
-            <maxFileSize>30MB</maxFileSize>
-        </triggeringPolicy>
 
         <!-- 对记录事件进行格式化。 -->
         <encoder>
