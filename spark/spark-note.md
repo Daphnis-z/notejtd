@@ -30,7 +30,12 @@
    把jdk版本换到8
    ```
 
+2. 使用python运行spark程序报resource错误
+
+   使用spark2.4.0就会报这个错，用spark2.3.0就可以了。
+
 **参考：**
 
 1. [*sparkJavaApi*逐个详解 - jinggangshan - 博客园](https://www.baidu.com/link?url=FvTPghf0wT472LMGJJmjOZH2lfTbZHFSnFcUS3yeBVXBwh1b2AZMVg8fxygGRiSxdfEhTcu8GWObNePUi6Mada&wd=&eqid=e8ab086c0001e57d000000035c039e5d)
+2. https://blog.csdn.net/baiziyuandyufei/article/details/81152553#7-本地运行pyspark程序
 
