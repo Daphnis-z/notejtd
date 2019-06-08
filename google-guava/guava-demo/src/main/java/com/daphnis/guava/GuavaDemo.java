@@ -2,8 +2,12 @@ package com.daphnis.guava;
 
 import java.util.List;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 /**
  * Hello world!
@@ -36,7 +40,7 @@ public class GuavaDemo
     public static void main( String[] args )
     {
     	listDemo();
-    	stringDemo();
+		stringDemo();	
     }
     
 }
