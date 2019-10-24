@@ -143,7 +143,7 @@ Hive有很多种客户端。
 
   用法：
 
-  ​	遍历一个列表对里面单个对象进行处理，返回 0 个或多个处理后的对象。一般用于对原始数据的处理，过滤掉无效的数据。
+  ​	遍历一个列表对里面单个对象进行处理，返回 0 个或多个处理后的新对象。一般用于对原始数据的处理，过滤掉无效的数据。
 
   代码示例：
 
@@ -243,6 +243,28 @@ Hive有很多种客户端。
 - **序列化**
 
   spark 在缓存 rdd 时使用的是 java 默认的序列化方式，这种比较慢。KyroSerializer 这种序列化方式，比 java 默认的更快并且占用的内存更少。
+
+#### 1.6.3 名词概念
+
+- **Shuffle**
+
+  ​	Shuffle 描述着数据从 map task 输出到 reduce task 输入的这段过程。
+
+  ​	Map 的结果要输出到 Reduce 中必须经过 shuffle 这个环节，shuffle 的性能高低直接影响了整个程序的性能和吞吐量。因为在分布式情况下，reduce task 需要跨节点去拉取其它节点上的 map task 结果。这一过程将会产生网络资源消耗和内存，磁盘IO的消耗。
+
+  ​	通常 shuffle 分为两部分：Map 阶段的数据准备和 Reduce 阶段的数据拷贝处理。一般将在 map 端的Shuffle 称之为 Shuffle Write，在 Reduce 端的 Shuffle 称之为 Shuffle Read. 
+
+  下图是 shuffle 的一个过程图：
+
+  ![shuffle-process](shuffle-process.png)
+
+  常见含有 shuffle 操作的算子： reduceByKey ， combineByKey ， sortByKey 
+
+
+
+**参考资料**：
+
+​	a.[Spark中的Spark Shuffle详解](https://www.cnblogs.com/itboys/p/9226479.html)
 
 ### 1.7 Kafka
 
