@@ -131,13 +131,19 @@ Hive有很多种客户端。
 
 ### 1.5 Yarn
 
-​	新一代Hadoop计算平台，将资源管理和处理组件分开，集成在Hadoop2.0中。
+新一代Hadoop计算平台，将资源管理和处理组件分开，集成在Hadoop2.0中。
 
 ### 1.6 Spark
 
 一个内存计算框架。
 
 #### 1.6.1 常用算子
+
+spark 的算子分为2大类：Transformations 和 Actions ，spark 操作是**懒执行**的，执行**转换类算子**时不会立即执行，只是把操作记录下来，等遇到**动作类算子**的时候就会提交作业真正开始执行。这样做的好处就是 spark 执行引擎可以智能优化转换类算子的执行流程，有些操作可以进行合并，提高执行效率。
+
+列一些开发中常用的算子（完整的算子介绍可以去看官方指导文档）：
+
+##### Transformations
 
 - **flatMap**
 
@@ -216,6 +222,34 @@ Hive有很多种客户端。
   }
   ```
 
+- **filter**
+
+  用法：
+
+  ​	遍历集合，把集合中符合要求的数据取出来作为一个新的集合返回。
+
+  代码示例：
+
+  ```
+  JavaRDD<String> originRdd=sparkContext.parallelize(Arrays.asList("it","is","my","life"));
+  JavaRDD<String> filterRdd=originRdd.filter(word->word.length()==2);
+  
+  List<String> words=filterRdd.collect();
+  System.out.println("filter demo,left words: "+words);
+  ```
+
+##### Actions
+
+- **collect**
+
+  **collect**(). Return all the elements of the dataset as an array at the driver program. This is usually useful after a filter or other operation that returns a sufficiently small subset of the data.
+
+  把数据集里面的数据全部收集到一个集合里返回，适用于集合数据比较少的情况（数据量过大，还全部收集到 driver 端，会导致程序因内存不足而崩溃），调试的时候可以把数据集拿到 driver 端验证程序结果。
+
+- **count**
+
+  统计数据集里的数据量，会触发 spark 作业，比较耗时，适用于程序调试，生产环境慎用。
+
 #### 1.6.2 一些技巧
 
 - **减少分区个数，加速程序运行**
@@ -265,6 +299,8 @@ Hive有很多种客户端。
 **参考资料**：
 
 ​	a.[Spark中的Spark Shuffle详解](https://www.cnblogs.com/itboys/p/9226479.html)
+
+​	b.[spark 官方指导文档](http://spark.apache.org/docs/latest/rdd-programming-guide.html)
 
 ### 1.7 Kafka
 

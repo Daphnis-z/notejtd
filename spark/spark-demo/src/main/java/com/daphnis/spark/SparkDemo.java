@@ -1,58 +1,58 @@
 package com.daphnis.spark;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.PairFunction;
-import scala.Tuple2;
-
 import java.util.Arrays;
 import java.util.List;
 
+import com.daphnis.spark.functions.FlatMapFunc;
+
 public class SparkDemo {
+
+    public static void println(String content) {
+        System.out.println("");
+        System.err.println(content);
+        System.out.println("");
+    }
+
+    /**
+     * filter 算子：遍历集合，把集合中符合要求的数据取出来作为一个新的集合返回
+     * @param sparkContext
+     */
+    public static void filterDemo(JavaSparkContext sparkContext) {
+        println("************************ filter demo ************************");
+
+        JavaRDD<String> originRdd=sparkContext.parallelize(Arrays.asList("it","is","my","life"));
+        JavaRDD<String> filterRdd=originRdd.filter(word->word.length()==2);
+
+        List<String> words=filterRdd.collect();
+        println("filter demo,left words: "+words);
+    }
+
+    /**
+     * flatMap 算子：遍历集合，将集合中的每个对象做处理，返回 0 个或多个新的对象
+     * @param sparkContext
+     */
+    public static void flatMapDemo(JavaSparkContext sparkContext) {
+        println("************************ flatMap demo ************************");
+
+        JavaRDD<String> originRdd=sparkContext.parallelize(Arrays.asList("flat","map","function","demo"));
+        JavaRDD<String> flatMapRdd=originRdd.flatMap(new FlatMapFunc(5));
+
+        List<String> words=flatMapRdd.collect();
+        println("flatMap demo,result words: "+words);
+    }
+
 
     public static void main(String... args) {
         SparkConf conf = new SparkConf().setAppName("SparkDemo").setMaster("local");
-        JavaSparkContext javaSparkContext = new JavaSparkContext(conf);
+        JavaSparkContext sparkContext = new JavaSparkContext(conf);
 
-        List<Integer> data = Arrays.asList(1,2,3,4,5);
-        JavaRDD<Integer> rdd = javaSparkContext.parallelize(data);
+        filterDemo(sparkContext);
+        flatMapDemo(sparkContext);
 
-        //FirstRDD
-        JavaPairRDD<Integer, Integer> firstRDD = rdd.mapToPair(new PairFunction<Integer, Integer, Integer>() {
-            @Override
-            public Tuple2<Integer, Integer> call(Integer num) throws Exception {
-                return new Tuple2<>(num, num * num);
-            }
-        });
-
-        //SecondRDD
-        JavaPairRDD<Integer, String> secondRDD = rdd.mapToPair(new PairFunction<Integer, Integer, String>() {
-            @Override
-            public Tuple2<Integer, String> call(Integer num) throws Exception {
-                return new Tuple2<>(num, String.valueOf((char)(64 + num * num)));
-            }
-        });
-
-        JavaPairRDD<Integer, Tuple2<Integer, String>> joinRDD = firstRDD.join(secondRDD);
-
-        JavaRDD<String> res = joinRDD.map(new Function<Tuple2<Integer, Tuple2<Integer, String>>, String>() {
-            @Override
-            public String call(Tuple2<Integer, Tuple2<Integer, String>> integerTuple2Tuple2) throws Exception {
-                int key = integerTuple2Tuple2._1();
-                int value1 = integerTuple2Tuple2._2()._1();
-                String value2 = integerTuple2Tuple2._2()._2();
-                return "<" + key + ",<" + value1 + "," + value2 + ">>";
-            }
-        });
-
-        List<String> resList = res.collect();
-        for(String str : resList)
-            System.out.println(str);
-
-        javaSparkContext.stop();
+        sparkContext.close();
     }
 
 }
