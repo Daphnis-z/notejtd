@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.daphnis.mybatis.mapper.GoodsMapper">
+
+  <sql id="tableName">
+    goods
+  </sql>
+
+  <select id="selectAllGoods" resultType="Goods">
+    select
+    goods_id,goods_name, price, count
+    from goods
+  </select>
+
+  <select id="selectOneGoods" resultType="Goods">
+    select
+    goods_id,goods_name, price, count
+    from goods
+    where goods_id=#{goodsId}
+  </select>
+
+  <insert id="insertOneGoods">
+    insert into
+    <include refid="tableName"/>
+    values (#{goodsId},#{goodsName},#{price},#{count})
+  </insert>
+
+  <delete id="deleteOneGoods">
+    delete from
+    <include refid="tableName"/>
+    where goods_id=#{goodsId}
+  </delete>
+
+  <update id="updateOneGoods">
+    update
+    <include refid="tableName"/>
+    set
+    goods_name=#{goodsName},price=#{price},count=#{count}
+    where goods_id=#{goodsId}
+  </update>
+
+</mapper>
