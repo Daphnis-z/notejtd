@@ -24,7 +24,9 @@ public class GoodsMapperTest {
   public void setUp() throws Exception {
     Reader reader = Resources.getResourceAsReader("mybatis-config.xml");
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-    sqlSession = sqlSessionFactory.openSession();
+
+    // 设置自动提交
+    sqlSession = sqlSessionFactory.openSession(true);
   }
 
   @After
@@ -48,39 +50,35 @@ public class GoodsMapperTest {
   public void testSelectOneGoods() {
     show("take a goods:");
 
-    Goods goods2 = sqlSession.selectOne("selectOneGoods", "G002");
+    Goods goods2 = sqlSession.selectOne("selectOneGoods", 2);
     show(goods2);
   }
 
   @Test
   public void testInsertOneGoods() {
-    Goods goods = new Goods("G011", "Spark Calculate", 60, 200);
+    Goods goods = new Goods("Spark Calculate", 60, 200);
     show("add a goods: " + goods);
 
     int result = sqlSession.insert("insertOneGoods", goods);
     if (result > 0) {
       show("add a goods success ..");
     }
-
-    sqlSession.commit();
   }
 
   @Test
   public void testDeleteOneGoods() {
-    String goodsId = "G011";
+    int goodsId = 3;
     show("delete goods: " + goodsId);
 
     int result = sqlSession.delete("deleteOneGoods", goodsId);
     if (result > 0) {
       show("delete goods success ..");
     }
-
-    sqlSession.commit();
   }
 
   @Test
   public void testUpdateOneGoods() {
-    Goods goods = new Goods("G002", "JVM-Simple", 25, 80);
+    Goods goods = new Goods("JVM-Simple", 25, 80);
     show("update goods: " + goods.getGoodsId());
 
     int result = sqlSession.update("updateOneGoods", goods);

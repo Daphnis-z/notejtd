@@ -184,7 +184,7 @@ MyBatis 中极为重要的调整设置，可以改变 MyBatis 的运行时行为
 
 ## 2.4 配置 typeAliases
 
-类型别名是为 Java 类型设置一个短的名字。它只和 XML 配置有关，存在的意义仅在于用来减少类完全限定名的冗余。
+**类型别名**是为 Java 类型设置一个短的名字。它只和 XML 配置有关，存在的意义仅在于用来减少类完全限定名的冗余。
 
 一般指定一个包名，MyBatis 会在包名下面搜索需要的 Java Bean ，如下：
 
@@ -228,9 +228,360 @@ MyBatis 允许在已映射语句执行过程中的某一点进行拦截调用。
 
 # 4. SQL 映射文件
 
+MyBatis 的真正强大在于它的**映射语句**，也是它的魔力所在。跟具有相同功能的 JDBC 代码进行对比，几乎省掉了 90%以上的代码。MyBatis 就是针对 SQL 构建的，并且比普通的方法做的更好。
+
+**下面是 SQL 映射文件中几个顶级元素：**
+
+- `cache`
+
+  给定命名空间的缓存配置。
+
+- `cache-ref`
+
+  其他命名空间缓存配置的引用。
+
+- `resultMap`
+
+  **最复杂也是最强大的元素**，用来描述如何从数据库结果集中来加载对象。
+
+- `sql`
+
+  可被其他语句引用的可重用语句块。
+
+- `insert`
+
+- `update`
+
+- `delete`
+
+- `select`
+
+## 4.1 select
+
+先看一个示例：
+
+```xml
+<select id="selectOneGoods" resultType="Goods">
+  select
+  goods_id,goods_name, price, count
+  from goods
+  where goods_id=#{goodsId}
+</select>
+```
+
+如何在代码中调用：
+
+```java
+Goods goods2 = sqlSession.selectOne("selectOneGoods", 2);
+```
+
+**select 常用属性：**
+
+- **id**
+
+  配置接口里面对应函数的名字，如下：
+
+  ```java
+  public interface GoodsMapper {
+  
+    List<Goods> selectAllGoods();
+  
+    Goods selectOneGoods(int goodsId);
+  }
+  ```
+
+- **resultType**
+
+  从这条语句中返回的期望类型的类的完全限定名或别名。一般用**类的别名**。
+
+- **resultMap**
+
+  外部 resultMap 的命名引用。结果集的映射是 MyBatis 最强大的特性，对其有一个很好的理解的话，许多复杂映射的情形都能迎刃而解。使用 resultMap 或 resultType，但不能同时使用。
+
+- **flushCache**
+
+  将其设置为 true，任何时候只要语句被调用，都会导致本地缓存和二级缓存都会被清空，默认值：false。
+
+- **useCache**
+
+  将其设置为 true，将会导致本条语句的结果被二级缓存，默认值：对 select 元素为 true。
+
+- **fetchSize**
+
+  这是尝试影响驱动程序每次批量返回的结果行数和这个设置值相等。默认值为 unset（依赖驱动）。
+
+## 4.2 insert
+
+先看一个示例：
+
+```xml
+<insert id="insertOneGoods" useGeneratedKeys="true" keyProperty="goodsId">
+  insert into
+  goods
+  (goods_name,price,count)
+  values (#{goodsName},#{price},#{count})
+</insert>
+```
+
+如果数据库有自增字段，可以把 useGeneratedKeys 设为 true ，keyProperty 是 java 里面自增字段的名称，这样每次插入就可以利用数据库自动生成 id 了。
+
+## 4.3 update
+
+```xml
+<update id="updateOneGoods">
+  update
+  goods
+  set
+  goods_name=#{goodsName},price=#{price},count=#{count}
+  where goods_id=#{goodsId}
+</update>
+```
+
+## 4.4 delete
+
+```xml
+<delete id="deleteOneGoods">
+  delete from
+  goods
+  where goods_id=#{goodsId}
+</delete>
+```
+
+## 4.5 sql
+
+用来定义可重用的 SQL 代码段，可以包含在其他语句中。如下：
+
+```xml
+<sql id="tableName">goods</sql>
+
+<delete id="deleteOneGoods">
+  delete from
+  <include refid="tableName"/>
+  where goods_id=#{goodsId}
+</delete>
+```
+
+## 4.6 resultMap
+
+resultMap 元素是 MyBatis 中最重要最强大的元素。目的是让开发者远离 90% 的需要从结果集中取出数据的 JDBC 代码, 而且在一些情形下允许做一些 JDBC 不支持的事 情。
+
+下面是一种比较简单的映射场景：
+
+```xml
+<resultMap id="userResultMap" type="User">
+  <id property="id" column="user_id" />
+  <result property="username" column="username"/>
+  <result property="password" column="password"/>
+</resultMap>   
+
+<select id="selectUsers" resultMap="userResultMap">
+  select user_id, user_name, hashed_password
+  from some_table
+  where id = #{id}
+</select>
+```
+
+TODO 还有一些比较高级的映射场景，这个后面有时间再研究下，下面是一个比较高级的映射：
+
+```xml
+<resultMap id="detailedBlogResultMap" type="Blog">
+  <constructor>
+    <idArg column="blog_id" javaType="int"/>
+  </constructor>
+  <result property="title" column="blog_title"/>
+  <association property="author" javaType="Author">
+    <id property="id" column="author_id"/>
+    <result property="username" column="author_username"/>
+    <result property="password" column="author_password"/>
+    <result property="email" column="author_email"/>
+    <result property="bio" column="author_bio"/>
+    <result property="favouriteSection" column="author_favourite_section"/>
+  </association>
+  <collection property="posts" ofType="Post">
+    <id property="id" column="post_id"/>
+    <result property="subject" column="post_subject"/>
+    <association property="author" javaType="Author"/>
+    <collection property="comments" ofType="Comment">
+      <id property="id" column="comment_id"/>
+    </collection>
+    <collection property="tags" ofType="Tag" >
+      <id property="id" column="tag_id"/>
+    </collection>
+    <discriminator javaType="int" column="draft">
+      <case value="1" resultType="DraftPost"/>
+    </discriminator>
+  </collection>
+</resultMap>
+```
+
+## 4.7 cache
+
+MyBatis 包含一个非常强大的查询缓存特性，可以非常方便地配置和定制。默认情况下是没有开启缓存的，除了局部的 session 缓存,可以增强变现而且处理循环依赖也是必须的。
+
+开启二级缓存,只需要在 SQL 映射文件中添加一行：
+
+```xml
+<cache/>
+```
+
+这样配置缓存，一切参数都是使用默认配置，效果如下：
+
+- 映射语句文件中的所有 select 语句将会被缓存
+- 映射语句文件中的所有 insert,update 和 delete 语句会刷新缓存
+- 缓存会使用 Least Recently Used(LRU,最近最少使用的)算法来收回
+- 根据时间表(比如 no Flush Interval,没有刷新间隔), 缓存不会以任何时间顺序来刷新
+- 缓存会存储列表集合或对象的 1024 个引用。
+- 缓存会被视为是 read/write 的缓存,意味着对象检索不是共享的,而且可以安全地被调用者修改,而不干扰其他调用者或线程所做的潜在修改
+
+**缓存回收的策略如下：**
+
+- `LRU` ——默认策略
+
+  最近最少使用的，移除最长时间不被使用的对象
+
+- `FIFO`
+
+  先进先出，按对象进入缓存的顺序来移除它们
+
+- `SOFT`
+
+  软引用，移除基于垃圾回收器状态和软引用规则的对象
+
+- `WEAK`
+
+  弱引用，更积极地移除基于垃圾收集器状态和弱引用规则的对象
+
+下面是一个使用 FIFO 回收策略的缓存配置：
+
+```xml
+<cache eviction="FIFO" flushInterval="60000" size="512" readOnly="true"/>
+```
+
 # 5. 动态 SQL
 
+MyBatis 的强大特性之一便是它的动态 SQL。通常使用动态 SQL 不可能是独立的一部分,MyBatis 使用一种强大的动态 SQL 语言来改进这种情形,这种语言可以被用在任意的 SQL 映射语句中。动态 SQL 元素和使用 JSTL 或其他类似基于 XML 的文本处理器相似。
 
+**动态 SQL 元素有如下几个：**
+
+- if
+- choose (when, otherwise)
+- trim (where, set)
+- foreach
+
+## 5.1 **if**
+
+```xml
+<select id="findActiveBlogWithTitleLike" resultType="Blog">
+  SELECT * FROM BLOG 
+  WHERE state = ‘ACTIVE’ 
+  <if test="title != null">
+    AND title like #{title}
+  </if>
+</select>
+```
+
+## 5.2 choose
+
+```xml
+<select id="findActiveBlogLike" resultType="Blog">
+  SELECT * FROM BLOG WHERE state = ‘ACTIVE’
+  <choose>
+    <when test="title != null">
+      AND title like #{title}
+    </when>
+    <when test="author != null and author.name != null">
+      AND author_name like #{author.name}
+    </when>
+    <otherwise>
+      AND featured = 1
+    </otherwise>
+  </choose>
+</select>
+```
+
+可以很容易的看出 choose 有点类似 switch 。
+
+## 5.3 **trim (where, set)**
+
+trim 和 where 可以实现同样的功能，对比如下：
+
+```xml
+<select id="findActiveBlogLike"
+     resultType="Blog">
+  SELECT * FROM BLOG 
+  <where> 
+    <if test="state != null">
+         state = #{state}
+    </if> 
+    <if test="title != null">
+        AND title like #{title}
+    </if>
+    <if test="author != null and author.name != null">
+        AND author_name like #{author.name}
+    </if>
+  </where>
+</select>
+
+<select id="findActiveBlogLike"
+     resultType="Blog">
+  SELECT * FROM BLOG 
+  <trim prefix="WHERE" prefixOverrides="AND |OR ">
+    <if test="state != null">
+         state = #{state}
+    </if> 
+    <if test="title != null">
+        AND title like #{title}
+    </if>
+    <if test="author != null and author.name != null">
+        AND author_name like #{author.name}
+    </if>
+  </trim>
+</select>
+```
+
+trim 和 set 也可以实现同样的功能，对比如下：
+
+```xml
+<update id="updateAuthorIfNecessary">
+  update Author
+    <set>
+      <if test="username != null">username=#{username},</if>
+      <if test="password != null">password=#{password},</if>
+      <if test="email != null">email=#{email},</if>
+      <if test="bio != null">bio=#{bio}</if>
+    </set>
+  where id=#{id}
+</update>
+
+<update id="updateAuthorIfNecessary">
+  update Author
+  <trim prefix="SET" suffixOverrides=",">
+      <if test="username != null">username=#{username},</if>
+      <if test="password != null">password=#{password},</if>
+      <if test="email != null">email=#{email},</if>
+      <if test="bio != null">bio=#{bio}</if>
+  </trim>
+  where id=#{id}
+</update>
+```
+
+## 5.4 **foreach**
+
+动态 SQL 的另外一个常用的必要操作是需要对一个集合进行遍历，通常是在构建 IN 条件语句的时候。比如：
+
+```xml
+<select id="selectPostIn" resultType="domain.blog.Post">
+  SELECT *
+  FROM POST P
+  WHERE ID in
+  <foreach item="item" index="index" collection="list"
+      open="(" separator="," close=")">
+        #{item}
+  </foreach>
+</select>
+```
+
+foreach 元素的功能是非常强大的，它允许指定一个集合，声明可以用在元素体内的集合项和索引变量。它也允许指定开闭匹配的字符串以及在迭代中间放置分隔符。这个元素是很智能的，因此它不会偶然地附加多余的分隔符。
 
 
 

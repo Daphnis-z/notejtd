@@ -7,11 +7,11 @@ public interface GoodsMapper {
 
   List<Goods> selectAllGoods();
 
-  Goods selectOneGoods(String goodsId);
+  Goods selectOneGoods(int goodsId);
 
   int insertOneGoods(Goods goods);
 
-  int deleteOneGoods(String goodsId);
+  int deleteOneGoods(int goodsId);
 
   int updateOneGoods(Goods goods);
 }

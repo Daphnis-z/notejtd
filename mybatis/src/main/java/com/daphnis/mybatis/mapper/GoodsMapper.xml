@@ -21,10 +21,11 @@
     where goods_id=#{goodsId}
   </select>
 
-  <insert id="insertOneGoods">
+  <insert id="insertOneGoods" useGeneratedKeys="true" keyProperty="goodsId">
     insert into
     <include refid="tableName"/>
-    values (#{goodsId},#{goodsName},#{price},#{count})
+    (goods_name,price,count)
+    values (#{goodsName},#{price},#{count})
   </insert>
 
   <delete id="deleteOneGoods">

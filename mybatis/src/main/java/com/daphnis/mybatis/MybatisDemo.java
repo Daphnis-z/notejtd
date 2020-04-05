@@ -10,7 +10,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 public class MybatisDemo {
 
-  private static SqlSessionFactory sqlSessionFactory;
+  private static final String ENV = "development";
 
   public static void show(Object msg) {
     System.out.println(msg.toString());
@@ -18,22 +18,15 @@ public class MybatisDemo {
 
   public static void main(String... args) throws Exception {
     Reader reader = Resources.getResourceAsReader("mybatis-config.xml");
-    sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+    SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(reader, ENV);
 
-    SqlSession sqlSession = null;
-    try {
-      sqlSession = sqlSessionFactory.openSession();
-
+    try (SqlSession sqlSession = sessionFactory.openSession()) {
       List<Goods> goodsList = sqlSession.selectList("selectAllGoods");
       for (int i = 0; i < goodsList.size(); i++) {
         show(goodsList.get(i));
       }
     } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      if (sqlSession != null) {
-        sqlSession.close();
-      }
     }
   }
   

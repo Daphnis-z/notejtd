@@ -2,23 +2,29 @@ package com.daphnis.mybatis.entity;
 
 public class Goods {
 
-  private String goodsId;
+  private int goodsId;
   private String goodsName;
   private double price;
   private int count;
 
-  public Goods(String goodsId, String goodsName, double price, int count) {
+  public Goods(String goodsName, double price, int count) {
+    this.goodsName = goodsName;
+    this.price = price;
+    this.count = count;
+  }
+
+  public Goods(int goodsId, String goodsName, double price, int count) {
     this.goodsId = goodsId;
     this.goodsName = goodsName;
     this.price = price;
     this.count = count;
   }
 
-  public String getGoodsId() {
+  public int getGoodsId() {
     return goodsId;
   }
 
-  public void setGoodsId(String goodsId) {
+  public void setGoodsId(int goodsId) {
     this.goodsId = goodsId;
   }
 
