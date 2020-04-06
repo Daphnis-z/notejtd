@@ -1,8 +1,8 @@
 # 1.总体介绍
 
-MyBatis 是支持定制化 SQL、存储过程以及高级映射的优秀的**持久层框架**。
+MyBatis 是一款优秀的**持久层框架**，支持**自定义 SQL**、**存储过程**以及**高级映射**。
 
-MyBatis 避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集，可以对配置和原生 Map 使用简单的 XML 或注解，将接口和 Java 的 POJOs(Plain Old Java Objects,普通的 Java 对象)映射成数据库中的记录。
+MyBatis 免除了几乎所有的 JDBC 代码以及设置参数和获取结果集的工作。MyBatis 可以通过简单的 XML 或注解来配置和映射原始类型、接口和 Java POJO（Plain Old Java Objects，普通老式 Java 对象）为数据库中的记录。
 
 ## 1.1 功能架构
 
@@ -86,6 +86,24 @@ mybatis 使用 property 的顺序如下：
 - 在 properties 元素体内指定的属性首先被读取。
 - 然后根据 properties 元素中的 resource 属性读取类路径下属性文件或根据 url 属性指定的路径读取属性文件，并覆盖已读取的同名属性。
 - 最后读取作为方法参数传递的属性，并覆盖已读取的同名属性。
+
+**为 property 设置默认值：**
+
+从 MyBatis 3.4.2 开始，可以为占位符指定一个默认值。例如：
+
+```xml
+<!-- 如果属性 'username' 没有被配置，'username' 属性的值将为 'ut_user' -->
+<property name="username" value="${username:ut_user}"/> 
+```
+
+但这个特性默认是关闭的。要启用这个特性，需要添加一个特定的属性来开启这个特性。例如：
+
+```xml
+<properties resource="org/mybatis/example/config.properties">
+  <!-- 启用默认值特性 -->
+  <property name="org.apache.ibatis.parsing.PropertyParser.enable-default-value" value="true"/>
+</properties>
+```
 
 ## 2.2 配置 environments
 
@@ -272,8 +290,11 @@ MyBatis 的真正强大在于它的**映射语句**，也是它的魔力所在�
 如何在代码中调用：
 
 ```java
-Goods goods2 = sqlSession.selectOne("selectOneGoods", 2);
+goodsMapper = sqlSession.getMapper(GoodsMapper.class);
+Goods goods2 = goodsMapper.selectOneGoods(2);
 ```
+
+注意：SqlSession 是**非线程安全**的，作用域一般是方法内，使用完要及时关闭。
 
 **select 常用属性：**
 
@@ -363,7 +384,7 @@ Goods goods2 = sqlSession.selectOne("selectOneGoods", 2);
 
 ## 4.6 resultMap
 
-resultMap 元素是 MyBatis 中最重要最强大的元素。目的是让开发者远离 90% 的需要从结果集中取出数据的 JDBC 代码, 而且在一些情形下允许做一些 JDBC 不支持的事 情。
+resultMap 元素是 MyBatis 中最重要最强大的元素。目的是让开发者远离 90% 的需要从结果集中取出数据的 JDBC 代码, 而且在一些情形下允许做一些 JDBC 不支持的事情。
 
 下面是一种比较简单的映射场景：
 
@@ -416,7 +437,7 @@ TODO 还有一些比较高级的映射场景，这个后面有时间再研究下
 
 ## 4.7 cache
 
-MyBatis 包含一个非常强大的查询缓存特性，可以非常方便地配置和定制。默认情况下是没有开启缓存的，除了局部的 session 缓存,可以增强变现而且处理循环依赖也是必须的。
+MyBatis 包含一个非常强大的查询缓存特性，可以非常方便地配置和定制。默认情况下是没有开启缓存的，除了局部的 session 缓存。
 
 开启二级缓存,只需要在 SQL 映射文件中添加一行：
 
@@ -589,6 +610,16 @@ foreach 元素的功能是非常强大的，它允许指定一个集合，声明
 
 
 
+
+
+
+
+TODO 后面有时间可以研究下 mybatis-generator-maven-plugin ，可以根据数据库自动生成 mapper 接口和配置文件。
+
+
+
 # 参考资料：
 
 1. [W3Cschool-MyBatis 教程](https://www.w3cschool.cn/mybatis/7zy61ilv.html)
+2. [MyBatis 官方文档](https://mybatis.org/mybatis-3/zh/index.html)
+3. [mybatis存储过程及mode=IN,mode=OUT的使用](https://blog.csdn.net/king101125s/article/details/104167858?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-3&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-3)

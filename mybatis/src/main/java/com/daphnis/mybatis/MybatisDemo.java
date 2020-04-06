@@ -21,6 +21,7 @@ public class MybatisDemo {
     SqlSessionFactory sessionFactory = new SqlSessionFactoryBuilder().build(reader, ENV);
 
     try (SqlSession sqlSession = sessionFactory.openSession()) {
+      // 这种是老的使用方式，最新的可以看单元测试
       List<Goods> goodsList = sqlSession.selectList("selectAllGoods");
       for (int i = 0; i < goodsList.size(); i++) {
         show(goodsList.get(i));
