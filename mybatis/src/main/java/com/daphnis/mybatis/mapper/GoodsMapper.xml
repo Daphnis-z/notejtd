@@ -21,6 +21,12 @@
     where goods_id=#{goodsId}
   </select>
 
+  <select id="selectGoodsListPage" resultType="Goods">
+    select
+    goods_id,goods_name, price, count
+    from goods
+  </select>
+
   <insert id="insertOneGoods" useGeneratedKeys="true" keyProperty="goodsId">
     insert into
     <include refid="tableName"/>

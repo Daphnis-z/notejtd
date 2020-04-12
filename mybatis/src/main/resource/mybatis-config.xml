@@ -19,6 +19,14 @@
     <package name="com.daphnis.mybatis.entity"/>
   </typeAliases>
 
+  <plugins>
+    <!-- 分页插件 -->
+    <plugin interceptor="com.daphnis.mybatis.plugin.PagePlugin">
+      <property name="dialect" value="mysql"/>
+      <property name="pageSqlId" value=".*ListPage.*"/>
+    </plugin>
+  </plugins>
+
   <environments default="development">
     <environment id="development">
       <transactionManager type="JDBC"></transactionManager>

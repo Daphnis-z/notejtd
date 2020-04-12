@@ -67,6 +67,8 @@ public class GoodsMapperTest {
     if (result > 0) {
       show("add a goods success ..");
     }
+
+    show("auto generate goods id: " + goods.getGoodsId());
   }
 
   @Test
