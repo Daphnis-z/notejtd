@@ -4,7 +4,6 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 
 import java.time.LocalDateTime;
@@ -18,7 +17,7 @@ public class KafkaSource {
 
         Properties properties = new Properties();
         //指定kafka的Broker地址
-        properties.setProperty("bootstrap.servers", "192.168.211.101:9092");
+        properties.setProperty("bootstrap.servers", "nn:9092");
         //指定组ID
         properties.setProperty("group.id", "flink-demo");
         //如果没有记录偏移量，第一次从最开始消费

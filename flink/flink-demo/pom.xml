@@ -14,7 +14,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <flink.version>1.9.1</flink.version>
+    <flink.version>1.14.3</flink.version>
     <scala.binary.version>2.11</scala.binary.version>
   </properties>
 
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-      <version>1.10.0</version>
+      <version>1.14.0</version>
     </dependency>
 
     <!-- Add logging framework, to produce console output when running in the IDE. -->
@@ -78,7 +78,34 @@
           <target>${java.version}</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4.1</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>com.daphnis.flink.KafkaSource</mainClass>
+            </manifest>
+          </archive>
+
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <!-- bind to the packaging phase -->
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
+
   </build>
 
 </project>
