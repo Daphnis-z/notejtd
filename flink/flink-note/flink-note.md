@@ -24,9 +24,39 @@ Flink 需要计算资源来执行应用程序，集成了常见的集群资源�
 
 - **state**，状态
 
-  只有在每一个单独的事件上进行转换操作的应用才不需要状态，换言之，每一个具有一定复杂度的流处理应用都是有状态的。任何运行一定业务逻辑的流处理应用都需要在一定时间内存储所接收的事件或中间结果，以供后续的某个时间点进行访问并进行后续处理。
+  只有在每一个单独的事件上进行转换操作的应用才不需要状态，换言之，每一个具有一定复杂度的流处理应用都是有状态的。任何运行一定业务逻辑的流处理应用都需要在一定时间内存储所接收的事件或中间结果，以供后续的某个时间点进行访问并进行后续处理
+
+- **job manager**
+
+  The *JobManager* has a number of responsibilities related to coordinating the distributed execution of Flink Applications: it decides when to schedule the next task (or set of tasks), reacts to finished tasks or execution failures, coordinates checkpoints, and coordinates recovery on failures, among others. 
+
+- **task manager**
+
+  The *TaskManagers* (also called *workers*) execute the tasks of a dataflow, and buffer and exchange the data streams.
+
+  There must always be at least one TaskManager.
+
+- **task slot**
+
+  The smallest unit of resource scheduling in a TaskManager is a task *slot*. The number of task slots in a TaskManager indicates the number of concurrent processing tasks. 
+
+  Each worker (TaskManager) is a *JVM process*, and may execute one or more subtasks in separate threads. To control how many tasks a TaskManager accepts, it has so called **task slots** (at least one).
+
+- **flink master**
+
+  
 
 # 3.架构设计
+
+![flink架构](flink架构.PNG)
+
+
+
+下面是 Task Manager的结构图：
+
+![task manager结构](Y:\code\project\notejtd\flink\flink-note\task manager结构.PNG)
+
+
 
 
 
@@ -125,4 +155,6 @@ Flink 需要计算资源来执行应用程序，集成了常见的集群资源�
 # 参考资料
 
 [Flink官方指引](https://flink.apache.org/zh/flink-architecture.html)
+
+[Flink Architecture](https://nightlies.apache.org/flink/flink-docs-release-1.14/docs/concepts/flink-architecture/)
 
