@@ -26,7 +26,8 @@ public class CEPDemo {
 
         // 1. 读取事件数据，创建简单事件流
         // 5402,83.149.11.115,success,1558430815
-        DataStream<LoginEvent> loginEventStream = env.readTextFile("data/login-log.csv").map((MapFunction<String, LoginEvent>) line -> {
+        DataStream<LoginEvent> loginEventStream = env.readTextFile("data/login-log.csv"
+        ).map((MapFunction<String, LoginEvent>) line -> {
             String[] arr = line.split(",");
             return new LoginEvent(Long.parseLong(arr[0].trim()), arr[1].trim(),
                     arr[2].trim(), Long.parseLong(arr[3].trim()));
